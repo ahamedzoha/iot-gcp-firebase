@@ -1,3 +1,6 @@
+//Dialogflow webhook client
+const { WebhookClient } = require('dialogflow-fulfillment')
+
 // The "Cloud Functions for Firebase" SDK to create Cloud Functions and setup triggers:
 const functions = require('firebase-functions');
 
@@ -16,7 +19,7 @@ exports.detectTelemetryEvents = functions.pubsub.topic('weather-telemetry-topic'
         // the message. We also round numbers to match DHT22 accuracy.
         const temperature = message.json.temperature.toFixed(1);
         const humidity = Math.round(message.json.humidity);
-        if((temperature<-40) || (temperature>80) || (humidity <0) || (humidity > 100)) return;
+        if ((temperature < -40) || (temperature > 80) || (humidity < 0) || (humidity > 100)) return;
         // A Pub/Sub message has an 'attributes' property. This property has itself some properties,
         // one of them being 'deviceId' to know which device published the message:
         const deviceId = message.attributes.deviceId;
@@ -31,3 +34,25 @@ exports.detectTelemetryEvents = functions.pubsub.topic('weather-telemetry-topic'
             humidity: humidity
         })
     });
+
+const TempQ = "temperatureQuery"
+
+exports.dfFulfillment = functions.https.onRequest((req, res) => {
+
+    const agent = new WebhookClient({
+        request: req,
+        response: res
+    })
+    console.log(`Dialogflow Request Headers: ${JSON.stringify(req.headers)}`)
+    console.log(`Dialogflow Request Body: ${JSON.stringify(req.body)}`)
+    // let temperature = agent.JSON.stringify(body.parameters.sensordata)
+
+    function temperatureQ(agent) {
+        console.log(`Intent cloudfunction matched ${agent.body.parameters}`)
+        agent.add(`Temperature Query Invoked!`)
+    }
+
+    let intentMap = new Map()
+    intentMap.set("temperatureQuery", temperatureQ)
+    agent.handleRequest(intentMap)
+})
