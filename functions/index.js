@@ -45,10 +45,9 @@ exports.dfFulfillment = functions.https.onRequest((req, res) => {
     })
     console.log(`Dialogflow Request Headers: ${JSON.stringify(req.headers)}`)
     console.log(`Dialogflow Request Body: ${JSON.stringify(req.body)}`)
-    // let temperature = agent.JSON.stringify(body.parameters.sensordata)
 
     function temperatureQ(agent) {
-        console.log(`Intent cloudfunction matched ${agent.body.parameters}`)
+        console.log(`Intent cloudfunction matched ${req.body.parameters}`)
         agent.add(`Temperature Query Invoked!`)
     }
 
